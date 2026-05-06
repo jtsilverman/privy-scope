@@ -43,6 +43,10 @@ function decodeJwt(token: string): {
   };
 }
 
+export function hasPrivyKeys(localStorage: Record<string, string>): boolean {
+  return Object.keys(localStorage).some((k) => k.startsWith("privy:"));
+}
+
 export function parsePrivyState(
   localStorage: Record<string, string>,
 ): ParsedPrivyState {
@@ -62,6 +66,26 @@ export function parsePrivyState(
     },
     rawKeys,
   };
+
+  const connectionsRaw = localStorage["privy:connections"];
+  if (connectionsRaw) {
+    try {
+      const parsed: unknown = JSON.parse(connectionsRaw);
+      if (Array.isArray(parsed)) {
+        for (const conn of parsed) {
+          if (conn && typeof conn === "object") {
+            const addr = (conn as Record<string, unknown>).address;
+            if (typeof addr === "string" && addr.length > 0) {
+              out.wallet.address = addr;
+              break;
+            }
+          }
+        }
+      }
+    } catch {
+      // malformed JSON; leave wallet.address null
+    }
+  }
 
   const tokenRaw = localStorage["privy:token"];
   if (tokenRaw) {

@@ -16,6 +16,15 @@ export default defineConfig({
     rollupOptions: {
       input: {
         popup: "popup.html",
+        background: "src/background.ts",
+      },
+      output: {
+        // background.js needs a stable filename so manifest.json can reference
+        // it by name. Other entries keep Vite's hashed default.
+        entryFileNames: (chunk) =>
+          chunk.name === "background"
+            ? "background.js"
+            : "assets/[name]-[hash].js",
       },
     },
   },

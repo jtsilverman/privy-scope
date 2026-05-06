@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { parsePrivyState } from "./parser";
+import { hasPrivyKeys, parsePrivyState } from "./parser";
 
 function makeJwt(
   header: Record<string, unknown>,
@@ -126,5 +126,49 @@ describe("parsePrivyState", () => {
     expect(out.token.expiresAt).toBeNull();
     expect(out.token.isExpired).toBe(false);
     expect(out.rawKeys).toEqual([]);
+  });
+});
+
+describe("parsePrivyState wallet from privy:connections", () => {
+  it("lifts wallet address from a populated privy:connections", () => {
+    const ls = {
+      "privy:connections": JSON.stringify([
+        {
+          address: "0x12070d26CaCf7b9C951A3Aa8531E2A3eDE5f52DE",
+          connectorType: "embedded",
+          walletClientType: "privy",
+          connectedAt: 1777919414000,
+          id: "io.privy.wallet",
+        },
+      ]),
+    };
+    const out = parsePrivyState(ls);
+    expect(out.wallet.address).toBe(
+      "0x12070d26CaCf7b9C951A3Aa8531E2A3eDE5f52DE",
+    );
+  });
+
+  it("returns null wallet.address when privy:connections is malformed JSON", () => {
+    const out = parsePrivyState({ "privy:connections": "not-json" });
+    expect(out.wallet.address).toBeNull();
+  });
+
+  it("returns null wallet.address when privy:connections is an empty array", () => {
+    const out = parsePrivyState({ "privy:connections": "[]" });
+    expect(out.wallet.address).toBeNull();
+  });
+});
+
+describe("hasPrivyKeys", () => {
+  it("returns true when at least one key starts with privy:", () => {
+    expect(hasPrivyKeys({ "privy:token": "x" })).toBe(true);
+  });
+
+  it("returns false on empty localStorage", () => {
+    expect(hasPrivyKeys({})).toBe(false);
+  });
+
+  it("returns false when no key starts with privy: (substring is not enough)", () => {
+    expect(hasPrivyKeys({ foo: "bar", "x-privy:token": "y" })).toBe(false);
   });
 });
