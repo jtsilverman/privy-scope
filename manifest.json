@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Privy DevTools",
+  "version": "0.1.0",
+  "description": "MV3 popup that surfaces privy:* state from the active tab's localStorage.",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Privy DevTools"
+  },
+  "permissions": ["storage", "activeTab", "scripting"]
+}
