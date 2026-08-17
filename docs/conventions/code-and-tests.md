@@ -64,6 +64,18 @@ in `entryFileNames` so it emits unhashed. Removing the special case produces
 the root README's Scope section is the contract. `background.ts` is written to work without the
 `tabs` permission, which is why its URL guard is best-effort.
 
+## The repo has two names
+
+The GitHub repository is `jtsilverman/privy-scope`, and `git remote -v` points there. The local
+checkout is `~/Documents/projects/privy-devtools`, and `package.json` still declares
+`git+https://github.com/jtsilverman/privy-devtools.git`.
+
+The rename happened on GitHub and the manifest was never updated. GitHub redirects the old URL, so
+nothing is broken today and the drift stays invisible until the redirect lapses. The extension's
+display name in `manifest.json` is "Privy DevTools", which is a product name and unaffected.
+
+Point `package.json`'s `repository.url` at `privy-scope` when this file is next touched.
+
 ## Git
 
 Commit subjects are plain imperative sentences: `Add badge service worker, lift wallet from
